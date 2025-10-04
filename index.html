@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бойцовский клуб | EDEM SID</title>
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -95,7 +89,7 @@
             margin-bottom: 5px;
             color: #ccc;
         }
-        input[type="file"], input[type="password"] {
+        input[type="file"], input[type="password"], input[type="text"] {
             width: 100%;
             padding: 10px;
             background: rgba(0,0,0,0.7);
@@ -118,10 +112,6 @@
         button:hover {
             background: #FF0000;
         }
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
         #adminMessage {
             margin-top: 1rem;
             padding: 10px;
@@ -130,7 +120,7 @@
         }
         .success { background: rgba(0,100,0,0.5); color: #00FF00; }
         .error { background: rgba(100,0,0,0.5); color: #FF0000; }
-        .loading { background: rgba(100,100,0,0.5); color: #FFFF00; }
+        .info { background: rgba(0,100,100,0.5); color: #00FFFF; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
@@ -148,11 +138,12 @@
             <div class="content">
                 <h1>ДОБРО ПОЖАЛОВАТЬ В <br>БОЙЦОВСКИЙ КЛУБ</h1>
                 <div class="image-container">
-                    <img id="prankImage" src="" alt="Пранк" class="clickable-image">
+                    <img id="prankImage" src="https://i.ibb.co/7n8q6zL/red-mystery.jpg" alt="Пранк" class="clickable-image">
                     <div class="click-hint">▶ НАЖМИ ДЛЯ ЗАПУСКА ЗВУКА</div>
                 </div>
                 <audio id="prankSound" preload="auto"></audio>
                 <p class="secret-hint">💡 Секрет: 5 быстрых нажатий откроют панель управления</p>
+                <div id="statusMessage"></div>
             </div>
         </section>
 
@@ -164,22 +155,61 @@
                     <div class="form-group">
                         <label>Загрузить картинку:</label>
                         <input type="file" id="imageUpload" accept="image/*">
+                        <small style="color: #888;">Файл сохранится в вашем браузере</small>
                     </div>
                     <div class="form-group">
                         <label>Загрузить звук:</label>
                         <input type="file" id="soundUpload" accept="audio/*">
+                        <small style="color: #888;">Файл сохранится в вашем браузере</small>
                     </div>
                     <div class="form-group">
                         <label>Пароль доступа:</label>
                         <input type="password" id="adminPassword" placeholder="Введите пароль">
                     </div>
-                    <button id="saveContent">СОХРАНИТЬ КОНТЕНТ ДЛЯ ВСЕХ</button>
+                    <button id="saveContent">СОХРАНИТЬ КОНТЕНТ</button>
                     <div id="adminMessage"></div>
                     
                     <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
-                        <h4 style="color: #FF0000; margin-bottom: 1rem;">Текущий публичный контент:</h4>
+                        <h4 style="color: #FF0000; margin-bottom: 1rem;">Текущий контент:</h4>
                         <div id="currentContent">
                             <p>Загрузка...</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(139,0,0,0.3); border-radius: 5px;">
+                        <h4 style="color: #FF0000; margin-bottom: 1rem;">🌐 Сделать контент публичным для всех:</h4>
+                        
+                        <div class="form-group">
+                            <label>Ссылка на картинку:</label>
+                            <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
+                            <small style="color: #888;">
+                                📸 Загрузите на 
+                                <a href="https://imgbb.com/" target="_blank" style="color: #FF4444;">ImgBB.com</a> 
+                                или <a href="https://postimages.org/" target="_blank" style="color: #FF4444;">PostImages.org</a>
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Ссылка на звук:</label>
+                            <input type="text" id="soundUrl" placeholder="https://example.com/sound.mp3">
+                            <small style="color: #888;">
+                                🎵 Загрузите на 
+                                <a href="https://vocaroo.com/" target="_blank" style="color: #FF4444;">Vocaroo.com</a>, 
+                                <a href="https://file.io/" target="_blank" style="color: #FF4444;">File.io</a>
+                                или <a href="https://tmpfiles.org/" target="_blank" style="color: #FF4444;">TmpFiles.org</a>
+                            </small>
+                        </div>
+                        
+                        <button id="saveUrls">СОХРАНИТЬ ССЫЛКИ ДЛЯ ВСЕХ</button>
+                        
+                        <div style="margin-top: 1rem; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 5px;">
+                            <h5 style="color: #FF4444; margin-bottom: 0.5rem;">📖 Инструкция:</h5>
+                            <ol style="text-align: left; color: #ccc; font-size: 0.8rem; padding-left: 1.2rem;">
+                                <li>Загрузите файлы на указанные сайты</li>
+                                <li>Скопируйте прямые ссылки на файлы</li>
+                                <li>Вставьте ссылки в поля выше</li>
+                                <li>Нажмите "СОХРАНИТЬ ССЫЛКИ ДЛЯ ВСЕХ"</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
@@ -188,21 +218,6 @@
     </main>
 
     <script>
-        // 🔥 ВАШИ НАСТРОЙКИ FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHNftBakmIFpMVf9zhyQGwdgTW4pyzrwA",
-            authDomain: "edddem-prank.firebaseapp.com",
-            projectId: "edddem-prank",
-            storageBucket: "edddem-prank.firebasestorage.app",
-            messagingSenderId: "826148021083",
-            appId: "1:826148021083:web:1a46046096a9d70228307e"
-        };
-
-        // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
         document.addEventListener('DOMContentLoaded', function() {
             const ADMIN_PASSWORD = 'DGhfjfkg8884655Dgjh';
             const prankImage = document.getElementById('prankImage');
@@ -210,15 +225,19 @@
             const imageUpload = document.getElementById('imageUpload');
             const soundUpload = document.getElementById('soundUpload');
             const saveButton = document.getElementById('saveContent');
+            const saveUrlsButton = document.getElementById('saveUrls');
             const adminPassword = document.getElementById('adminPassword');
             const adminMessage = document.getElementById('adminMessage');
             const currentContent = document.getElementById('currentContent');
+            const statusMessage = document.getElementById('statusMessage');
+            const imageUrlInput = document.getElementById('imageUrl');
+            const soundUrlInput = document.getElementById('soundUrl');
 
             let uploadedImageFile = null;
             let uploadedSoundFile = null;
 
-            // Загрузка публичного контента при открытии сайта
-            loadPublicContent();
+            // Загрузка сохраненного контента
+            loadSavedContent();
 
             // Клик по картинке - звук
             prankImage.addEventListener('click', function() {
@@ -228,38 +247,38 @@
                         showMessage('🔇 Нажмите на страницу перед воспроизведением', 'error');
                     });
                 } else {
-                    showMessage('🎵 Звук не загружен', 'error');
+                    showMessage('🎵 Сначала загрузите звук', 'error');
                 }
             });
 
-            // Загрузка картинки
+            // Загрузка картинки (локальная)
             imageUpload.addEventListener('change', function(e) {
                 uploadedImageFile = e.target.files[0];
                 if (uploadedImageFile && uploadedImageFile.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         prankImage.src = e.target.result;
-                        showMessage('🖼️ Картинка готова к загрузке', 'success');
+                        showMessage('🖼️ Картинка загружена (локально)', 'success');
                     };
                     reader.readAsDataURL(uploadedImageFile);
                 }
             });
 
-            // Загрузка звука
+            // Загрузка звука (локальная)
             soundUpload.addEventListener('change', function(e) {
                 uploadedSoundFile = e.target.files[0];
                 if (uploadedSoundFile && uploadedSoundFile.type.startsWith('audio/')) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         prankSound.src = e.target.result;
-                        showMessage('🎵 Звук готов к загрузке', 'success');
+                        showMessage('🎵 Звук загружен (локально)', 'success');
                     };
                     reader.readAsDataURL(uploadedSoundFile);
                 }
             });
 
-            // Сохранение в Firebase (публично для всех)
-            saveButton.addEventListener('click', async function() {
+            // Сохранение локального контента
+            saveButton.addEventListener('click', function() {
                 if (!adminPassword.value) {
                     showMessage('Введите пароль', 'error');
                     return;
@@ -270,100 +289,118 @@
                     return;
                 }
 
-                if (!uploadedImageFile && !uploadedSoundFile) {
-                    showMessage('Загрузите хотя бы один файл', 'error');
+                // Сохраняем в localStorage
+                const content = {
+                    image: uploadedImageFile ? URL.createObjectURL(uploadedImageFile) : prankImage.src,
+                    sound: uploadedSoundFile ? URL.createObjectURL(uploadedSoundFile) : prankSound.src,
+                    timestamp: new Date().getTime()
+                };
+                
+                localStorage.setItem('edddem_prank_content', JSON.stringify(content));
+                showMessage('✅ Контент сохранен в вашем браузере!', 'success');
+                
+                loadSavedContent();
+                adminPassword.value = '';
+            });
+
+            // Сохранение публичных ссылок
+            saveUrlsButton.addEventListener('click', function() {
+                if (!adminPassword.value) {
+                    showMessage('Введите пароль', 'error');
+                    return;
+                }
+                
+                if (adminPassword.value !== ADMIN_PASSWORD) {
+                    showMessage('Неверный пароль', 'error');
                     return;
                 }
 
-                showMessage('📤 Загружаем контент для всех пользователей...', 'loading');
-                saveButton.disabled = true;
+                const imageUrl = imageUrlInput.value.trim();
+                const soundUrl = soundUrlInput.value.trim();
 
-                try {
-                    let imageUrl = '';
-                    let soundUrl = '';
-
-                    // Загрузка картинки в Firebase Storage
-                    if (uploadedImageFile) {
-                        showMessage('📤 Загружаем картинку...', 'loading');
-                        const imageRef = storage.ref().child('prank/image.jpg');
-                        await imageRef.put(uploadedImageFile);
-                        imageUrl = await imageRef.getDownloadURL();
-                    }
-
-                    // Загрузка звука в Firebase Storage
-                    if (uploadedSoundFile) {
-                        showMessage('📤 Загружаем звук...', 'loading');
-                        const soundRef = storage.ref().child('prank/sound.mp3');
-                        await soundRef.put(uploadedSoundFile);
-                        soundUrl = await soundRef.getDownloadURL();
-                    }
-
-                    // Получаем текущий контент чтобы сохранить то, что не меняли
-                    const currentData = await getCurrentContent();
-
-                    // Сохранение ссылок в Firestore
-                    await db.collection('content').doc('current').set({
-                        imageUrl: imageUrl || currentData.imageUrl,
-                        soundUrl: soundUrl || currentData.soundUrl,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    showMessage('✅ Контент сохранен для всех пользователей!', 'success');
-                    
-                    // Обновляем отображение
-                    loadPublicContent();
-                    
-                    // Очищаем форму
-                    adminPassword.value = '';
-                    imageUpload.value = '';
-                    soundUpload.value = '';
-                    uploadedImageFile = null;
-                    uploadedSoundFile = null;
-
-                } catch (error) {
-                    console.error('Ошибка загрузки:', error);
-                    showMessage('❌ Ошибка загрузки: ' + error.message, 'error');
-                } finally {
-                    saveButton.disabled = false;
+                if (!imageUrl && !soundUrl) {
+                    showMessage('Введите хотя бы одну ссылку', 'error');
+                    return;
                 }
+
+                // Проверяем ссылки
+                if (imageUrl && !isValidUrl(imageUrl)) {
+                    showMessage('Некорректная ссылка на картинку', 'error');
+                    return;
+                }
+
+                if (soundUrl && !isValidUrl(soundUrl)) {
+                    showMessage('Некорректная ссылка на звук', 'error');
+                    return;
+                }
+
+                // Сохраняем публичные ссылки
+                const publicContent = {
+                    imageUrl: imageUrl,
+                    soundUrl: soundUrl,
+                    timestamp: new Date().getTime()
+                };
+                
+                localStorage.setItem('edddem_public_content', JSON.stringify(publicContent));
+                showMessage('✅ Публичные ссылки сохранены! Все пользователи увидят этот контент.', 'success');
+                
+                // Применяем публичный контент
+                if (imageUrl) prankImage.src = imageUrl;
+                if (soundUrl) prankSound.src = soundUrl;
+                
+                loadSavedContent();
+                adminPassword.value = '';
+                imageUrlInput.value = '';
+                soundUrlInput.value = '';
             });
 
-            // Загрузка публичного контента
-            async function loadPublicContent() {
-                try {
-                    const content = await getCurrentContent();
-                    
-                    if (content.imageUrl) {
-                        prankImage.src = content.imageUrl;
-                    } else {
-                        prankImage.src = 'https://i.ibb.co/7n8q6zL/red-mystery.jpg';
-                    }
-                    
-                    if (content.soundUrl) {
-                        prankSound.src = content.soundUrl;
-                    }
+            // Загрузка сохраненного контента
+            function loadSavedContent() {
+                // Локальный контент
+                const localContent = JSON.parse(localStorage.getItem('edddem_prank_content') || '{}');
+                // Публичный контент
+                const publicContent = JSON.parse(localStorage.getItem('edddem_public_content') || '{}');
 
-                    // Показываем текущий контент в админке
-                    currentContent.innerHTML = `
-                        <p><strong>Картинка:</strong> ${content.imageUrl ? '✅ Загружена' : '❌ Нет'}</p>
-                        <p><strong>Звук:</strong> ${content.soundUrl ? '✅ Загружен' : '❌ Нет'}</p>
-                        ${content.updatedAt ? `<p><strong>Обновлено:</strong> ${new Date(content.updatedAt.toDate()).toLocaleString('ru-RU')}</p>` : ''}
-                    `;
-
-                } catch (error) {
-                    console.error('Ошибка загрузки контента:', error);
-                    currentContent.innerHTML = '<p style="color: #FF0000;">Ошибка загрузки контента</p>';
+                // Приоритет у публичного контента
+                if (publicContent.imageUrl) {
+                    prankImage.src = publicContent.imageUrl;
+                } else if (localContent.image) {
+                    prankImage.src = localContent.image;
                 }
+
+                if (publicContent.soundUrl) {
+                    prankSound.src = publicContent.soundUrl;
+                } else if (localContent.sound) {
+                    prankSound.src = localContent.sound;
+                }
+
+                // Показываем текущий контент
+                let contentHtml = '';
+                
+                if (publicContent.imageUrl || publicContent.soundUrl) {
+                    contentHtml += '<p style="color: #00FF00;"><strong>🌐 Публичный контент (видят все):</strong></p>';
+                    contentHtml += `<p>Картинка: ${publicContent.imageUrl ? '✅' : '❌'}</p>`;
+                    contentHtml += `<p>Звук: ${publicContent.soundUrl ? '✅' : '❌'}</p>`;
+                    if (publicContent.timestamp) {
+                        contentHtml += `<p><small>Обновлено: ${new Date(publicContent.timestamp).toLocaleString('ru-RU')}</small></p>`;
+                    }
+                    contentHtml += '<br>';
+                }
+                
+                contentHtml += '<p><strong>💾 Локальный контент (только у вас):</strong></p>';
+                contentHtml += `<p>Картинка: ${localContent.image ? '✅' : '❌'}</p>`;
+                contentHtml += `<p>Звук: ${localContent.sound ? '✅' : '❌'}</p>`;
+
+                currentContent.innerHTML = contentHtml;
             }
 
-            // Получение текущего контента из Firestore
-            async function getCurrentContent() {
+            // Проверка URL
+            function isValidUrl(string) {
                 try {
-                    const doc = await db.collection('content').doc('current').get();
-                    return doc.exists ? doc.data() : { imageUrl: '', soundUrl: '' };
-                } catch (error) {
-                    console.error('Ошибка получения контента:', error);
-                    return { imageUrl: '', soundUrl: '' };
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
                 }
             }
 
@@ -398,7 +435,8 @@
                 }
             });
 
-            console.log('🎭 EDEM SID Prank System запущен с Firebase');
+            console.log('🎭 EDEM SID Prank System запущен');
+            showMessage('✅ Система готова к работе!', 'info');
         });
     </script>
 </body>

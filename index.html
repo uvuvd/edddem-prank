@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бойцовский клуб | EDEM SID</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            color: #fff; 
+            background: #000; 
+            overflow: hidden;
+            height: 100vh;
+        }
+        .watermark {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #8B0000;
+            font-size: 14px;
+            z-index: 1000;
+            font-weight: bold;
+        }
+        .container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+        .section {
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            background: radial-gradient(circle at 20% 50%, #200000, #000000);
+        }
+        .content {
+            max-width: 800px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #FF0000;
+            text-shadow: 0 0 10px rgba(255,0,0,0.5);
+        }
+        .image-container {
+            max-width: 500px;
+            border: 2px solid #8B0000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 2rem auto;
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
+        }
+        .clickable-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            cursor: pointer;
+            background: #111;
+        }
+        .click-hint {
+            background: rgba(139, 0, 0, 0.9);
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+        }
+        .secret-hint {
+            color: #666;
+            margin-top: 2rem;
+            font-style: italic;
+        }
+        .admin-panel {
+            background: rgba(40, 0, 0, 0.9);
+            border: 1px solid #8B0000;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        input[type="file"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #8B0000;
+            border-radius: 5px;
+            color: white;
+            margin: 5px 0;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #FF0000;
+        }
+        #adminMessage {
+            margin-top: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success { background: rgba(0,100,0,0.5); color: #00FF00; }
+        .error { background: rgba(100,0,0,0.5); color: #FF0000; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .image-container { margin: 1rem; }
+            .clickable-image { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">BY EDEM SID</div>
+
+    <main class="container">
+        <!-- Главная страница -->
+        <section class="section">
+            <div class="content">
+                <h1>ДОБРО ПОЖАЛОВАТЬ В <br>БОЙЦОВСКИЙ КЛУБ</h1>
+                <div class="image-container">
+                    <img id="prankImage" src="https://i.ibb.co/7n8q6zL/red-mystery.jpg" alt="Пранк" class="clickable-image">
+                    <div class="click-hint">▶ НАЖМИ ДЛЯ ЗАПУСКА ЗВУКА</div>
+                </div>
+                <audio id="prankSound" preload="auto"></audio>
+                <p class="secret-hint">💡 Секрет: 5 быстрых нажатий откроют панель управления</p>
+            </div>
+        </section>
+
+        <!-- Админка -->
+        <section class="section">
+            <div class="content">
+                <h1>ПАНЕЛЬ УПРАВЛЕНИЯ<br>EDEM SID</h1>
+                <div class="admin-panel">
+                    <div class="form-group">
+                        <label>Загрузить картинку:</label>
+                        <input type="file" id="imageUpload" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Загрузить звук:</label>
+                        <input type="file" id="soundUpload" accept="audio/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль доступа:</label>
+                        <input type="password" id="adminPassword" placeholder="Введите пароль">
+                    </div>
+                    <button id="saveContent">СОХРАНИТЬ КОНТЕНТ</button>
+                    <div id="adminMessage"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ADMIN_PASSWORD = 'DGhfjfkg8884655Dgjh';
+            const prankImage = document.getElementById('prankImage');
+            const prankSound = document.getElementById('prankSound');
+            const imageUpload = document.getElementById('imageUpload');
+            const soundUpload = document.getElementById('soundUpload');
+            const saveButton = document.getElementById('saveContent');
+            const adminPassword = document.getElementById('adminPassword');
+            const adminMessage = document.getElementById('adminMessage');
+
+            // Загрузка сохраненного контента
+            function loadContent() {
+                const saved = localStorage.getItem('edddem_prank_content');
+                if (saved) {
+                    const content = JSON.parse(saved);
+                    if (content.image) prankImage.src = content.image;
+                    if (content.sound) prankSound.src = content.sound;
+                }
+            }
+            loadContent();
+
+            // Клик по картинке - звук
+            prankImage.addEventListener('click', function() {
+                if (prankSound.src && prankSound.src !== '') {
+                    prankSound.currentTime = 0;
+                    prankSound.play().catch(e => {
+                        showMessage('🔇 Нажмите на страницу перед воспроизведением', 'error');
+                    });
+                } else {
+                    showMessage('🎵 Сначала загрузите звук', 'error');
+                }
+            });
+
+            // Загрузка картинки
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        prankImage.src = e.target.result;
+                        showMessage('🖼️ Картинка загружена', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Загрузка звука
+            soundUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        prankSound.src = e.target.result;
+                        showMessage('🎵 Звук загружен', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Сохранение
+            saveButton.addEventListener('click', function() {
+                if (!adminPassword.value) {
+                    showMessage('Введите пароль', 'error');
+                    return;
+                }
+                
+                if (adminPassword.value !== ADMIN_PASSWORD) {
+                    showMessage('Неверный пароль', 'error');
+                    return;
+                }
+
+                const content = {
+                    image: prankImage.src,
+                    sound: prankSound.src,
+                    timestamp: new Date().getTime()
+                };
+                
+                localStorage.setItem('edddem_prank_content', JSON.stringify(content));
+                showMessage('✅ Контент сохранен!', 'success');
+                adminPassword.value = '';
+            });
+
+            // Сообщения
+            function showMessage(text, type) {
+                adminMessage.textContent = text;
+                adminMessage.className = type;
+                setTimeout(() => {
+                    adminMessage.textContent = '';
+                    adminMessage.className = '';
+                }, 3000);
+            }
+
+            // Секретный вход в админку - 5 тапов
+            let tapCount = 0;
+            let lastTap = 0;
+            document.addEventListener('click', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                
+                const now = new Date().getTime();
+                if (now - lastTap < 500) {
+                    tapCount++;
+                } else {
+                    tapCount = 1;
+                }
+                lastTap = now;
+
+                if (tapCount >= 5) {
+                    document.querySelectorAll('.section')[1].scrollIntoView({ behavior: 'smooth' });
+                    showMessage('🔓 Панель управления активирована', 'success');
+                    tapCount = 0;
+                }
+            });
+
+            console.log('🎭 EDEM SID Prank System запущен');
+        });
+    </script>
+</body>
+</html>

@@ -123,6 +123,12 @@
         .success { background: rgba(0,100,0,0.5); color: #00FF00; }
         .error { background: rgba(100,0,0,0.5); color: #FF0000; }
         .info { background: rgba(0,100,100,0.5); color: #00FFFF; }
+        .share-section {
+            background: rgba(139,0,0,0.2);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
 
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
@@ -187,21 +193,20 @@
                     <button id="saveContent">СОХРАНИТЬ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ</button>
                     <div id="adminMessage"></div>
                     
+                    <div class="share-section">
+                        <h4 style="color: #FF0000; margin-bottom: 1rem;">🔗 Ссылка с вашим контентом:</h4>
+                        <div id="shareUrl" style="word-break: break-all; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; margin-bottom: 1rem;">
+                            Сначала сохраните контент
+                        </div>
+                        <button id="copyUrl">СКОПИРОВАТЬ ССЫЛКУ</button>
+                        <small style="color: #888; display: block; margin-top: 0.5rem;">Используйте эту ссылку для NFC меток</small>
+                    </div>
+                    
                     <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
                         <h4 style="color: #FF0000; margin-bottom: 1rem;">Текущий публичный контент:</h4>
                         <div id="currentContent">
                             <p>Загрузка...</p>
                         </div>
-                    </div>
-
-                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 5px;">
-                        <h5 style="color: #FF4444; margin-bottom: 0.5rem;">📖 Инструкция по загрузке:</h5>
-                        <ol style="text-align: left; color: #ccc; font-size: 0.8rem; padding-left: 1.2rem;">
-                            <li><strong>Для картинки:</strong> ImgBB.com → Загрузить → Копировать прямую ссылку</li>
-                            <li><strong>Для звука:</strong> Vocaroo.com → Записать → Сохранить → Копировать ссылку</li>
-                            <li>Вставить ссылки в поля выше</li>
-                            <li>Ввести пароль и нажать "СОХРАНИТЬ"</li>
-                        </ol>
                     </div>
                 </div>
             </div>
@@ -219,9 +224,11 @@
             const currentContent = document.getElementById('currentContent');
             const imageUrlInput = document.getElementById('imageUrl');
             const soundUrlInput = document.getElementById('soundUrl');
+            const shareUrlDiv = document.getElementById('shareUrl');
+            const copyUrlButton = document.getElementById('copyUrl');
 
-            // Загрузка публичного контента
-            loadPublicContent();
+            // Загрузка контента из URL параметров
+            loadContentFromUrl();
 
             // Клик по картинке - звук
             prankImage.addEventListener('click', function() {
@@ -235,7 +242,7 @@
                 }
             });
 
-            // Сохранение публичного контента
+            // Сохранение контента и генерация ссылки
             saveButton.addEventListener('click', function() {
                 if (!adminPassword.value) {
                     showMessage('Введите пароль', 'error');
@@ -266,18 +273,30 @@
                     return;
                 }
 
-                // Сохраняем публичные ссылки
+                // Генерируем URL с контентом
+                const urlParams = new URLSearchParams();
+                if (imageUrl) urlParams.set('image', encodeURIComponent(imageUrl));
+                if (soundUrl) urlParams.set('sound', encodeURIComponent(soundUrl));
+                
+                const shareUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+                
+                // Показываем ссылку для копирования
+                shareUrlDiv.innerHTML = `<a href="${shareUrl}" target="_blank" style="color: #00FF00;">${shareUrl}</a>`;
+                
+                // Сохраняем в localStorage для текущего устройства
                 const publicContent = {
                     imageUrl: imageUrl,
                     soundUrl: soundUrl,
-                    timestamp: new Date().getTime()
+                    timestamp: new Date().getTime(),
+                    shareUrl: shareUrl
                 };
                 
                 localStorage.setItem('edddem_public_content', JSON.stringify(publicContent));
-                showMessage('✅ Контент сохранен! Все пользователи увидят изменения.', 'success');
                 
-                // Применяем публичный контент
-                loadPublicContent();
+                showMessage('✅ Контент сохранен! Используйте ссылку выше для NFC меток.', 'success');
+                
+                // Применяем контент
+                applyContent(imageUrl, soundUrl);
                 
                 // Очищаем форму
                 adminPassword.value = '';
@@ -285,29 +304,63 @@
                 soundUrlInput.value = '';
             });
 
-            // Загрузка публичного контента
-            function loadPublicContent() {
-                const publicContent = JSON.parse(localStorage.getItem('edddem_public_content') || '{}');
-
-                // Применяем публичный контент
-                if (publicContent.imageUrl) {
-                    prankImage.src = publicContent.imageUrl;
+            // Копирование ссылки
+            copyUrlButton.addEventListener('click', function() {
+                const url = shareUrlDiv.querySelector('a')?.href || shareUrlDiv.textContent;
+                if (url && url !== 'Сначала сохраните контент') {
+                    navigator.clipboard.writeText(url).then(() => {
+                        showMessage('📋 Ссылка скопирована в буфер!', 'success');
+                    });
                 }
+            });
 
-                if (publicContent.soundUrl) {
-                    prankSound.src = publicContent.soundUrl;
+            // Загрузка контента из URL параметров
+            function loadContentFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const imageUrl = urlParams.get('image');
+                const soundUrl = urlParams.get('sound');
+
+                if (imageUrl || soundUrl) {
+                    // Используем контент из URL
+                    applyContent(
+                        imageUrl ? decodeURIComponent(imageUrl) : null,
+                        soundUrl ? decodeURIComponent(soundUrl) : null
+                    );
+                    updateCurrentContentDisplay(
+                        decodeURIComponent(imageUrl || ''),
+                        decodeURIComponent(soundUrl || '')
+                    );
+                } else {
+                    // Используем сохраненный контент
+                    const savedContent = JSON.parse(localStorage.getItem('edddem_public_content') || '{}');
+                    if (savedContent.imageUrl || savedContent.soundUrl) {
+                        applyContent(savedContent.imageUrl, savedContent.soundUrl);
+                        if (savedContent.shareUrl) {
+                            shareUrlDiv.innerHTML = `<a href="${savedContent.shareUrl}" target="_blank" style="color: #00FF00;">${savedContent.shareUrl}</a>`;
+                        }
+                    }
+                    updateCurrentContentDisplay(savedContent.imageUrl, savedContent.soundUrl);
                 }
+            }
 
-                // Показываем текущий контент
+            // Применение контента
+            function applyContent(imageUrl, soundUrl) {
+                if (imageUrl) {
+                    prankImage.src = imageUrl;
+                }
+                if (soundUrl) {
+                    prankSound.src = soundUrl;
+                }
+            }
+
+            // Обновление отображения текущего контента
+            function updateCurrentContentDisplay(imageUrl, soundUrl) {
                 let contentHtml = '';
                 
-                if (publicContent.imageUrl || publicContent.soundUrl) {
+                if (imageUrl || soundUrl) {
                     contentHtml += '<p style="color: #00FF00;"><strong>🌐 Активный публичный контент:</strong></p>';
-                    contentHtml += `<p>Картинка: ${publicContent.imageUrl ? '✅ Загружена' : '❌ Нет'}</p>`;
-                    contentHtml += `<p>Звук: ${publicContent.soundUrl ? '✅ Загружен' : '❌ Нет'}</p>`;
-                    if (publicContent.timestamp) {
-                        contentHtml += `<p><small>Обновлено: ${new Date(publicContent.timestamp).toLocaleString('ru-RU')}</small></p>`;
-                    }
+                    contentHtml += `<p>Картинка: ${imageUrl ? '✅ Загружена' : '❌ Нет'}</p>`;
+                    contentHtml += `<p>Звук: ${soundUrl ? '✅ Загружен' : '❌ Нет'}</p>`;
                 } else {
                     contentHtml += '<p style="color: #FF4444;">❌ Публичный контент не настроен</p>';
                     contentHtml += '<p><small>Используется стандартная картинка</small></p>';
@@ -358,7 +411,6 @@
             });
 
             console.log('🎭 EDEM SID doxing mod запущен');
-            showMessage('✅ Система готова к работе!', 'info');
         });
     </script>
 </body>

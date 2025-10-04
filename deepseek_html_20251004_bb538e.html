@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бойцовский клуб | NFC Prank</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Блок с псевдонимом -->
+    <div class="watermark">BY EDEM SID</div>
+
+    <main class="container">
+        <!-- Секция 1: Главный экран с картинкой -->
+        <section class="section active" id="section1">
+            <div class="content">
+                <h1>ДОБРО ПОЖАЛОВАТЬ В <span class="accent">БОЙЦОВСКИЙ КЛУБ</span></h1>
+                
+                <div class="image-container">
+                    <img id="prankImage" src="https://i.ibb.co/7n8q6zL/red-mystery.jpg" alt="Пранк" class="clickable-image">
+                    <div class="click-hint">▶ НАЖМИ ДЛЯ ЗАПУСКА ЗВУКА</div>
+                </div>
+
+                <audio id="prankSound" preload="auto"></audio>
+
+                <div class="secret-hint">💡 Секрет: 5 быстрых нажатий откроют панель управления</div>
+            </div>
+        </section>
+
+        <!-- Секция 2: Личный кабинет -->
+        <section class="section" id="adminSection">
+            <div class="content">
+                <h2>ПАНЕЛЬ <span class="accent">УПРАВЛЕНИЯ EDEM SID</span></h2>
+                <div class="admin-panel">
+                    <div class="admin-form">
+                        <h3>Загрузка контента для пранка</h3>
+                        
+                        <!-- Загрузка картинки -->
+                        <div class="form-group">
+                            <label>Загрузить картинку:</label>
+                            <input type="file" id="imageUpload" accept="image/*">
+                            <div class="preview-container">
+                                <div id="imagePreview" class="image-preview"></div>
+                            </div>
+                            <small>Поддерживаются: JPG, PNG, GIF</small>
+                        </div>
+
+                        <!-- Загрузка звука -->
+                        <div class="form-group">
+                            <label>Загрузить звук:</label>
+                            <input type="file" id="soundUpload" accept="audio/*">
+                            <div class="preview-container">
+                                <audio id="soundPreview" controls style="width: 100%; margin-top: 10px;"></audio>
+                            </div>
+                            <small>Поддерживаются: MP3, WAV, OGG</small>
+                        </div>
+
+                        <!-- Пароль -->
+                        <div class="form-group">
+                            <label>Пароль доступа:</label>
+                            <input type="password" id="adminPassword" placeholder="Введите пароль администратора">
+                        </div>
+
+                        <button id="saveContent" class="admin-button">СОХРАНИТЬ КОНТЕНТ</button>
+                        <div id="adminMessage" class="message"></div>
+
+                        <!-- Текущий контент -->
+                        <div class="current-content">
+                            <h4>Текущий контент:</h4>
+                            <div id="currentContent">
+                                <div class="current-item">
+                                    <strong>Картинка:</strong> 
+                                    <span id="currentImageStatus">Не загружена</span>
+                                </div>
+                                <div class="current-item">
+                                    <strong>Звук:</strong> 
+                                    <span id="currentSoundStatus">Не загружен</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

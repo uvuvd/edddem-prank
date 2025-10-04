@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бойцовский клуб | EDEM SID</title>
+    <title>doxing mod | EDEM SID</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -41,10 +41,12 @@
             max-width: 800px;
         }
         h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 2rem;
             color: #FF0000;
             text-shadow: 0 0 10px rgba(255,0,0,0.5);
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
         .image-container {
             max-width: 500px;
@@ -89,7 +91,7 @@
             margin-bottom: 5px;
             color: #ccc;
         }
-        input[type="file"], input[type="password"], input[type="text"] {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 10px;
             background: rgba(0,0,0,0.7);
@@ -136,7 +138,7 @@
         <!-- Главная страница -->
         <section class="section">
             <div class="content">
-                <h1>ДОБРО ПОЖАЛОВАТЬ В <br>БОЙЦОВСКИЙ КЛУБ</h1>
+                <h1>doxing mod</h1>
                 <div class="image-container">
                     <img id="prankImage" src="https://i.ibb.co/7n8q6zL/red-mystery.jpg" alt="Пранк" class="clickable-image">
                     <div class="click-hint">▶ НАЖМИ ДЛЯ ЗАПУСКА ЗВУКА</div>
@@ -152,65 +154,54 @@
             <div class="content">
                 <h1>ПАНЕЛЬ УПРАВЛЕНИЯ<br>EDEM SID</h1>
                 <div class="admin-panel">
-                    <div class="form-group">
-                        <label>Загрузить картинку:</label>
-                        <input type="file" id="imageUpload" accept="image/*">
-                        <small style="color: #888;">Файл сохранится в вашем браузере</small>
+                    <div style="margin-bottom: 2rem; padding: 1rem; background: rgba(139,0,0,0.3); border-radius: 5px;">
+                        <h4 style="color: #FF0000; margin-bottom: 1rem;">🌐 Настройка публичного контента:</h4>
+                        <p style="color: #ccc; font-size: 0.9rem;">Все изменения будут видны всем пользователям сайта</p>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Загрузить звук:</label>
-                        <input type="file" id="soundUpload" accept="audio/*">
-                        <small style="color: #888;">Файл сохранится в вашем браузере</small>
+                        <label>Ссылка на картинку:</label>
+                        <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
+                        <small style="color: #888;">
+                            📸 Загрузите на 
+                            <a href="https://imgbb.com/" target="_blank" style="color: #FF4444;">ImgBB.com</a> 
+                            и вставьте прямую ссылку
+                        </small>
                     </div>
+                    
+                    <div class="form-group">
+                        <label>Ссылка на звук:</label>
+                        <input type="text" id="soundUrl" placeholder="https://example.com/sound.mp3">
+                        <small style="color: #888;">
+                            🎵 Загрузите на 
+                            <a href="https://vocaroo.com/" target="_blank" style="color: #FF4444;">Vocaroo.com</a>
+                            и вставьте прямую ссылку
+                        </small>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Пароль доступа:</label>
-                        <input type="password" id="adminPassword" placeholder="Введите пароль">
+                        <input type="password" id="adminPassword" placeholder="Введите пароль администратора">
                     </div>
-                    <button id="saveContent">СОХРАНИТЬ КОНТЕНТ</button>
+                    
+                    <button id="saveContent">СОХРАНИТЬ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ</button>
                     <div id="adminMessage"></div>
                     
                     <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
-                        <h4 style="color: #FF0000; margin-bottom: 1rem;">Текущий контент:</h4>
+                        <h4 style="color: #FF0000; margin-bottom: 1rem;">Текущий публичный контент:</h4>
                         <div id="currentContent">
                             <p>Загрузка...</p>
                         </div>
                     </div>
 
-                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(139,0,0,0.3); border-radius: 5px;">
-                        <h4 style="color: #FF0000; margin-bottom: 1rem;">🌐 Сделать контент публичным для всех:</h4>
-                        
-                        <div class="form-group">
-                            <label>Ссылка на картинку:</label>
-                            <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
-                            <small style="color: #888;">
-                                📸 Загрузите на 
-                                <a href="https://imgbb.com/" target="_blank" style="color: #FF4444;">ImgBB.com</a> 
-                                или <a href="https://postimages.org/" target="_blank" style="color: #FF4444;">PostImages.org</a>
-                            </small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Ссылка на звук:</label>
-                            <input type="text" id="soundUrl" placeholder="https://example.com/sound.mp3">
-                            <small style="color: #888;">
-                                🎵 Загрузите на 
-                                <a href="https://vocaroo.com/" target="_blank" style="color: #FF4444;">Vocaroo.com</a>, 
-                                <a href="https://file.io/" target="_blank" style="color: #FF4444;">File.io</a>
-                                или <a href="https://tmpfiles.org/" target="_blank" style="color: #FF4444;">TmpFiles.org</a>
-                            </small>
-                        </div>
-                        
-                        <button id="saveUrls">СОХРАНИТЬ ССЫЛКИ ДЛЯ ВСЕХ</button>
-                        
-                        <div style="margin-top: 1rem; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 5px;">
-                            <h5 style="color: #FF4444; margin-bottom: 0.5rem;">📖 Инструкция:</h5>
-                            <ol style="text-align: left; color: #ccc; font-size: 0.8rem; padding-left: 1.2rem;">
-                                <li>Загрузите файлы на указанные сайты</li>
-                                <li>Скопируйте прямые ссылки на файлы</li>
-                                <li>Вставьте ссылки в поля выше</li>
-                                <li>Нажмите "СОХРАНИТЬ ССЫЛКИ ДЛЯ ВСЕХ"</li>
-                            </ol>
-                        </div>
+                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 5px;">
+                        <h5 style="color: #FF4444; margin-bottom: 0.5rem;">📖 Инструкция по загрузке:</h5>
+                        <ol style="text-align: left; color: #ccc; font-size: 0.8rem; padding-left: 1.2rem;">
+                            <li><strong>Для картинки:</strong> ImgBB.com → Загрузить → Копировать прямую ссылку</li>
+                            <li><strong>Для звука:</strong> Vocaroo.com → Записать → Сохранить → Копировать ссылку</li>
+                            <li>Вставить ссылки в поля выше</li>
+                            <li>Ввести пароль и нажать "СОХРАНИТЬ"</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -222,22 +213,15 @@
             const ADMIN_PASSWORD = 'DGhfjfkg8884655Dgjh';
             const prankImage = document.getElementById('prankImage');
             const prankSound = document.getElementById('prankSound');
-            const imageUpload = document.getElementById('imageUpload');
-            const soundUpload = document.getElementById('soundUpload');
             const saveButton = document.getElementById('saveContent');
-            const saveUrlsButton = document.getElementById('saveUrls');
             const adminPassword = document.getElementById('adminPassword');
             const adminMessage = document.getElementById('adminMessage');
             const currentContent = document.getElementById('currentContent');
-            const statusMessage = document.getElementById('statusMessage');
             const imageUrlInput = document.getElementById('imageUrl');
             const soundUrlInput = document.getElementById('soundUrl');
 
-            let uploadedImageFile = null;
-            let uploadedSoundFile = null;
-
-            // Загрузка сохраненного контента
-            loadSavedContent();
+            // Загрузка публичного контента
+            loadPublicContent();
 
             // Клик по картинке - звук
             prankImage.addEventListener('click', function() {
@@ -247,64 +231,12 @@
                         showMessage('🔇 Нажмите на страницу перед воспроизведением', 'error');
                     });
                 } else {
-                    showMessage('🎵 Сначала загрузите звук', 'error');
+                    showMessage('🎵 Звук не загружен', 'error');
                 }
             });
 
-            // Загрузка картинки (локальная)
-            imageUpload.addEventListener('change', function(e) {
-                uploadedImageFile = e.target.files[0];
-                if (uploadedImageFile && uploadedImageFile.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        prankImage.src = e.target.result;
-                        showMessage('🖼️ Картинка загружена (локально)', 'success');
-                    };
-                    reader.readAsDataURL(uploadedImageFile);
-                }
-            });
-
-            // Загрузка звука (локальная)
-            soundUpload.addEventListener('change', function(e) {
-                uploadedSoundFile = e.target.files[0];
-                if (uploadedSoundFile && uploadedSoundFile.type.startsWith('audio/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        prankSound.src = e.target.result;
-                        showMessage('🎵 Звук загружен (локально)', 'success');
-                    };
-                    reader.readAsDataURL(uploadedSoundFile);
-                }
-            });
-
-            // Сохранение локального контента
+            // Сохранение публичного контента
             saveButton.addEventListener('click', function() {
-                if (!adminPassword.value) {
-                    showMessage('Введите пароль', 'error');
-                    return;
-                }
-                
-                if (adminPassword.value !== ADMIN_PASSWORD) {
-                    showMessage('Неверный пароль', 'error');
-                    return;
-                }
-
-                // Сохраняем в localStorage
-                const content = {
-                    image: uploadedImageFile ? URL.createObjectURL(uploadedImageFile) : prankImage.src,
-                    sound: uploadedSoundFile ? URL.createObjectURL(uploadedSoundFile) : prankSound.src,
-                    timestamp: new Date().getTime()
-                };
-                
-                localStorage.setItem('edddem_prank_content', JSON.stringify(content));
-                showMessage('✅ Контент сохранен в вашем браузере!', 'success');
-                
-                loadSavedContent();
-                adminPassword.value = '';
-            });
-
-            // Сохранение публичных ссылок
-            saveUrlsButton.addEventListener('click', function() {
                 if (!adminPassword.value) {
                     showMessage('Введите пароль', 'error');
                     return;
@@ -342,54 +274,44 @@
                 };
                 
                 localStorage.setItem('edddem_public_content', JSON.stringify(publicContent));
-                showMessage('✅ Публичные ссылки сохранены! Все пользователи увидят этот контент.', 'success');
+                showMessage('✅ Контент сохранен! Все пользователи увидят изменения.', 'success');
                 
                 // Применяем публичный контент
-                if (imageUrl) prankImage.src = imageUrl;
-                if (soundUrl) prankSound.src = soundUrl;
+                loadPublicContent();
                 
-                loadSavedContent();
+                // Очищаем форму
                 adminPassword.value = '';
                 imageUrlInput.value = '';
                 soundUrlInput.value = '';
             });
 
-            // Загрузка сохраненного контента
-            function loadSavedContent() {
-                // Локальный контент
-                const localContent = JSON.parse(localStorage.getItem('edddem_prank_content') || '{}');
-                // Публичный контент
+            // Загрузка публичного контента
+            function loadPublicContent() {
                 const publicContent = JSON.parse(localStorage.getItem('edddem_public_content') || '{}');
 
-                // Приоритет у публичного контента
+                // Применяем публичный контент
                 if (publicContent.imageUrl) {
                     prankImage.src = publicContent.imageUrl;
-                } else if (localContent.image) {
-                    prankImage.src = localContent.image;
                 }
 
                 if (publicContent.soundUrl) {
                     prankSound.src = publicContent.soundUrl;
-                } else if (localContent.sound) {
-                    prankSound.src = localContent.sound;
                 }
 
                 // Показываем текущий контент
                 let contentHtml = '';
                 
                 if (publicContent.imageUrl || publicContent.soundUrl) {
-                    contentHtml += '<p style="color: #00FF00;"><strong>🌐 Публичный контент (видят все):</strong></p>';
-                    contentHtml += `<p>Картинка: ${publicContent.imageUrl ? '✅' : '❌'}</p>`;
-                    contentHtml += `<p>Звук: ${publicContent.soundUrl ? '✅' : '❌'}</p>`;
+                    contentHtml += '<p style="color: #00FF00;"><strong>🌐 Активный публичный контент:</strong></p>';
+                    contentHtml += `<p>Картинка: ${publicContent.imageUrl ? '✅ Загружена' : '❌ Нет'}</p>`;
+                    contentHtml += `<p>Звук: ${publicContent.soundUrl ? '✅ Загружен' : '❌ Нет'}</p>`;
                     if (publicContent.timestamp) {
                         contentHtml += `<p><small>Обновлено: ${new Date(publicContent.timestamp).toLocaleString('ru-RU')}</small></p>`;
                     }
-                    contentHtml += '<br>';
+                } else {
+                    contentHtml += '<p style="color: #FF4444;">❌ Публичный контент не настроен</p>';
+                    contentHtml += '<p><small>Используется стандартная картинка</small></p>';
                 }
-                
-                contentHtml += '<p><strong>💾 Локальный контент (только у вас):</strong></p>';
-                contentHtml += `<p>Картинка: ${localContent.image ? '✅' : '❌'}</p>`;
-                contentHtml += `<p>Звук: ${localContent.sound ? '✅' : '❌'}</p>`;
 
                 currentContent.innerHTML = contentHtml;
             }
@@ -435,7 +357,7 @@
                 }
             });
 
-            console.log('🎭 EDEM SID Prank System запущен');
+            console.log('🎭 EDEM SID doxing mod запущен');
             showMessage('✅ Система готова к работе!', 'info');
         });
     </script>

@@ -122,11 +122,12 @@
             <div class="content">
                 <h1>doxing mod</h1>
                 <div class="image-container">
-                    <img id="prankImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyNTAiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIyMDAiIHk9IjEyNSIgZmlsbD0iIzhCMDAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj5ET1hJTkcgTU9EPC90ZXh0Pjwvc3ZnPg==" alt="doxing mod">
+                    <img id="prankImage" src="https://files.catbox.moe/ne6zjn.jpg" alt="doxing mod" class="clickable-image">
                     <div class="click-hint">▶ НАЖМИ ДЛЯ ЗВУКА</div>
                 </div>
-                <audio id="prankSound"></audio>
+                <audio id="prankSound" src="https://files.catbox.moe/45r01q.mp3" preload="auto"></audio>
                 <p style="color: #666; margin-top: 1rem;">💡 5 кликов → админка</p>
+                <div id="statusMessage" style="margin-top: 1rem; color: #0f0;">✅ Контент загружен и готов к работе!</div>
             </div>
         </section>
 
@@ -134,21 +135,32 @@
             <div class="content">
                 <h1>ПАНЕЛЬ УПРАВЛЕНИЯ</h1>
                 <div class="admin-panel">
+                    <div style="background: rgba(139,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 1rem;">
+                        <p style="color: #ccc; font-size: 14px; margin: 0;">🌐 Текущий контент загружен и активен</p>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Ссылка на картинку:</label>
-                        <input type="text" id="imageUrl" placeholder="https://...">
+                        <input type="text" id="imageUrl" placeholder="https://..." value="https://files.catbox.moe/ne6zjn.jpg">
                     </div>
                     <div class="form-group">
                         <label>Ссылка на звук:</label>
-                        <input type="text" id="soundUrl" placeholder="https://...">
+                        <input type="text" id="soundUrl" placeholder="https://..." value="https://files.catbox.moe/45r01q.mp3">
                     </div>
                     <div class="form-group">
                         <label>Пароль:</label>
                         <input type="password" id="adminPassword" placeholder="Пароль">
                     </div>
-                    <button id="saveContent">СОХРАНИТЬ</button>
+                    <button id="saveContent">ОБНОВИТЬ КОНТЕНТ</button>
                     <div id="adminMessage"></div>
-                    <div id="shareUrl" style="margin-top: 1rem; word-break: break-all; background: #111; padding: 10px; border-radius: 5px; font-size: 12px;"></div>
+                    
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
+                        <h4 style="color: #FF0000; margin-bottom: 0.5rem;">🔗 Готовая ссылка для NFC:</h4>
+                        <div id="shareUrl" style="word-break: break-all; background: #111; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 0.5rem;">
+                            https://your-site.com?img=https://files.catbox.moe/ne6zjn.jpg&snd=https://files.catbox.moe/45r01q.mp3
+                        </div>
+                        <button id="copyUrl" style="background: #006600;">СКОПИРОВАТЬ ССЫЛКУ</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -166,27 +178,29 @@
             const adminPass = document.getElementById('adminPassword');
             const message = document.getElementById('adminMessage');
             const shareUrl = document.getElementById('shareUrl');
+            const copyUrlBtn = document.getElementById('copyUrl');
+            const statusMessage = document.getElementById('statusMessage');
 
-            // Загрузка из URL параметров
-            const urlParams = new URLSearchParams(location.search);
-            const imgParam = urlParams.get('img');
-            const sndParam = urlParams.get('snd');
-
-            if (imgParam) prankImage.src = decodeURIComponent(imgParam);
-            if (sndParam) prankSound.src = decodeURIComponent(sndParam);
+            // Автоматически генерируем ссылку при загрузке
+            updateShareUrl();
 
             // Клик по картинке
             prankImage.addEventListener('click', function() {
                 if (prankSound.src) {
                     prankSound.currentTime = 0;
                     prankSound.play().catch(e => {
-                        showMessage('Нажмите на страницу для звука', 'error');
+                        showMessage('Нажмите на страницу для активации звука', 'error');
                     });
                 }
             });
 
             // Сохранение
             saveBtn.addEventListener('click', function() {
+                if (!adminPass.value) {
+                    showMessage('Введите пароль', 'error');
+                    return;
+                }
+
                 if (adminPass.value !== PASSWORD) {
                     showMessage('Неверный пароль', 'error');
                     return;
@@ -200,23 +214,48 @@
                     return;
                 }
 
-                // Генерация ссылки
-                const params = new URLSearchParams();
-                if (imgUrl) params.set('img', encodeURIComponent(imgUrl));
-                if (sndUrl) params.set('snd', encodeURIComponent(sndUrl));
-                
-                const generatedUrl = `${location.origin}${location.pathname}?${params}`;
-                shareUrl.innerHTML = `<a href="${generatedUrl}" style="color: #0f0;">${generatedUrl}</a>`;
-
-                // Применение
+                // Применение нового контента
                 if (imgUrl) prankImage.src = imgUrl;
                 if (sndUrl) prankSound.src = sndUrl;
 
-                showMessage('Сохранено!', 'success');
+                // Обновление ссылки
+                updateShareUrl();
+
+                showMessage('Контент обновлен!', 'success');
                 adminPass.value = '';
             });
 
-            // Секретный вход
+            // Копирование ссылки
+            copyUrlBtn.addEventListener('click', function() {
+                const textToCopy = shareUrl.textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showMessage('Ссылка скопирована в буфер!', 'success');
+                }).catch(() => {
+                    // Fallback для старых браузеров
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showMessage('Ссылка скопирована!', 'success');
+                });
+            });
+
+            // Обновление ссылки для NFC
+            function updateShareUrl() {
+                const imgUrl = imageUrl.value.trim() || 'https://files.catbox.moe/ne6zjn.jpg';
+                const sndUrl = soundUrl.value.trim() || 'https://files.catbox.moe/45r01q.mp3';
+                
+                const params = new URLSearchParams();
+                params.set('img', encodeURIComponent(imgUrl));
+                params.set('snd', encodeURIComponent(sndUrl));
+                
+                const generatedUrl = `${window.location.origin}${window.location.pathname}?${params}`;
+                shareUrl.textContent = generatedUrl;
+            }
+
+            // Секретный вход в админку
             let taps = 0, lastTap = 0;
             document.addEventListener('click', function(e) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
@@ -227,8 +266,8 @@
                 
                 lastTap = now;
                 if (taps >= 5) {
-                    document.querySelectorAll('.section')[1].scrollIntoView();
-                    showMessage('Админка открыта', 'success');
+                    document.querySelectorAll('.section')[1].scrollIntoView({behavior: 'smooth'});
+                    showMessage('Панель управления активирована!', 'success');
                     taps = 0;
                 }
             });
@@ -236,8 +275,27 @@
             function showMessage(text, type) {
                 message.textContent = text;
                 message.className = type;
-                setTimeout(() => message.textContent = '', 3000);
+                setTimeout(() => {
+                    message.textContent = '';
+                    message.className = '';
+                }, 3000);
             }
+
+            // Проверка загрузки контента
+            prankImage.onload = function() {
+                statusMessage.textContent = '✅ Картинка и звук загружены! Сайт готов к работе.';
+            };
+
+            prankImage.onerror = function() {
+                statusMessage.textContent = '⚠️ Ошибка загрузки картинки';
+                statusMessage.style.color = '#ff4444';
+            };
+
+            prankSound.oncanplaythrough = function() {
+                statusMessage.textContent = '✅ Картинка и звук загружены! Сайт готов к работе.';
+            };
+
+            console.log('🎭 EDEM SID doxing mod запущен с готовым контентом!');
         });
     </script>
 </body>

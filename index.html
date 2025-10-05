@@ -122,10 +122,10 @@
             <div class="content">
                 <h1>doxing mod</h1>
                 <div class="image-container">
-                    <img id="prankImage" src="https://files.catbox.moe/ne6zjn.jpg" alt="doxing mod" class="clickable-image">
+                    <img id="prankImage" src="https://d.uguu.se/GsoqmUfm.jpg" alt="doxing mod" class="clickable-image">
                     <div class="click-hint">▶ НАЖМИ ДЛЯ ЗВУКА</div>
                 </div>
-                <audio id="prankSound" src="https://files.catbox.moe/45r01q.mp3" preload="auto"></audio>
+                <audio id="prankSound" src="https://d.uguu.se/cjxewZVk.mp3" preload="auto"></audio>
                 <p style="color: #666; margin-top: 1rem;">💡 5 кликов → админка</p>
                 <div id="statusMessage" style="margin-top: 1rem; color: #0f0;">✅ Контент загружен и готов к работе!</div>
             </div>
@@ -141,11 +141,11 @@
                     
                     <div class="form-group">
                         <label>Ссылка на картинку:</label>
-                        <input type="text" id="imageUrl" placeholder="https://..." value="https://files.catbox.moe/ne6zjn.jpg">
+                        <input type="text" id="imageUrl" placeholder="https://..." value="https://d.uguu.se/GsoqmUfm.jpg">
                     </div>
                     <div class="form-group">
                         <label>Ссылка на звук:</label>
-                        <input type="text" id="soundUrl" placeholder="https://..." value="https://files.catbox.moe/45r01q.mp3">
+                        <input type="text" id="soundUrl" placeholder="https://..." value="https://d.uguu.se/cjxewZVk.mp3">
                     </div>
                     <div class="form-group">
                         <label>Пароль:</label>
@@ -157,7 +157,7 @@
                     <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
                         <h4 style="color: #FF0000; margin-bottom: 0.5rem;">🔗 Готовая ссылка для NFC:</h4>
                         <div id="shareUrl" style="word-break: break-all; background: #111; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 0.5rem;">
-                            https://your-site.com?img=https://files.catbox.moe/ne6zjn.jpg&snd=https://files.catbox.moe/45r01q.mp3
+                            https://your-site.com?img=https://d.uguu.se/GsoqmUfm.jpg&snd=https://d.uguu.se/cjxewZVk.mp3
                         </div>
                         <button id="copyUrl" style="background: #006600;">СКОПИРОВАТЬ ССЫЛКУ</button>
                     </div>
@@ -244,8 +244,8 @@
 
             // Обновление ссылки для NFC
             function updateShareUrl() {
-                const imgUrl = imageUrl.value.trim() || 'https://files.catbox.moe/ne6zjn.jpg';
-                const sndUrl = soundUrl.value.trim() || 'https://files.catbox.moe/45r01q.mp3';
+                const imgUrl = imageUrl.value.trim() || 'https://d.uguu.se/GsoqmUfm.jpg';
+                const sndUrl = soundUrl.value.trim() || 'https://d.uguu.se/cjxewZVk.mp3';
                 
                 const params = new URLSearchParams();
                 params.set('img', encodeURIComponent(imgUrl));
@@ -295,7 +295,7 @@
                 statusMessage.textContent = '✅ Картинка и звук загружены! Сайт готов к работе.';
             };
 
-            console.log('🎭 EDEM SID doxing mod запущен с готовым контентом!');
+            console.log('🎭 EDEM SID doxing mod запущен с Uguu.se контентом!');
         });
     </script>
 </body>

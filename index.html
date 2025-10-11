@@ -6,15 +6,6 @@
     <title>doxing mod | EDEM SID</title>
     <meta name="description" content="NFC Prank">
     <meta name="theme-color" content="#8B0000">
-    <!-- PWA мета-теги -->
-    <link rel="manifest" href="data:application/json,{
-        \"name\": \"doxing mod EDEM SID\",
-        \"short_name\": \"doxingmod\",
-        \"start_url\": \".\",
-        \"display\": \"fullscreen\",
-        \"theme_color\": \"#8B0000\",
-        \"background_color\": \"#000000\"
-    }">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -112,6 +103,12 @@
         }
         .success { background: rgba(0,100,0,0.5); color: #0f0; }
         .error { background: rgba(100,0,0,0.5); color: #f00; }
+        .file-upload {
+            background: rgba(139,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -122,12 +119,14 @@
             <div class="content">
                 <h1>doxing mod</h1>
                 <div class="image-container">
-                    <img id="prankImage" src="https://d.uguu.se/GsoqmUfm.jpg" alt="doxing mod" class="clickable-image">
+                    <!-- GIF будет загружена из папки files -->
+                    <img id="prankImage" src="./files/prank.gif" alt="doxing mod" class="clickable-image">
                     <div class="click-hint">▶ НАЖМИ ДЛЯ ЗВУКА</div>
                 </div>
-                <audio id="prankSound" src="https://d.uguu.se/cjxewZVk.mp3" preload="auto"></audio>
+                <!-- Звук будет загружен из папки files -->
+                <audio id="prankSound" src="./files/sound.mp3" preload="auto"></audio>
                 <p style="color: #666; margin-top: 1rem;">💡 5 кликов → админка</p>
-                <div id="statusMessage" style="margin-top: 1rem; color: #0f0;">✅ Контент загружен и готов к работе!</div>
+                <div id="statusMessage" style="margin-top: 1rem; color: #0f0;">Загрузка контента...</div>
             </div>
         </section>
 
@@ -135,17 +134,21 @@
             <div class="content">
                 <h1>ПАНЕЛЬ УПРАВЛЕНИЯ</h1>
                 <div class="admin-panel">
-                    <div style="background: rgba(139,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 1rem;">
-                        <p style="color: #ccc; font-size: 14px; margin: 0;">🌐 Текущий контент загружен и активен</p>
+                    <div class="file-upload">
+                        <h4 style="color: #FF0000; margin-bottom: 0.5rem;">📁 Файлы в репозитории:</h4>
+                        <p style="color: #ccc; font-size: 14px; margin: 0;">
+                            • <strong>prank.gif</strong> - GIF анимация<br>
+                            • <strong>sound.mp3</strong> - звуковой файл
+                        </p>
                     </div>
                     
                     <div class="form-group">
-                        <label>Ссылка на картинку:</label>
-                        <input type="text" id="imageUrl" placeholder="https://..." value="https://d.uguu.se/GsoqmUfm.jpg">
+                        <label>Имя GIF файла:</label>
+                        <input type="text" id="gifName" placeholder="prank.gif" value="prank.gif">
                     </div>
                     <div class="form-group">
-                        <label>Ссылка на звук:</label>
-                        <input type="text" id="soundUrl" placeholder="https://..." value="https://d.uguu.se/cjxewZVk.mp3">
+                        <label>Имя звукового файла:</label>
+                        <input type="text" id="soundName" placeholder="sound.mp3" value="sound.mp3">
                     </div>
                     <div class="form-group">
                         <label>Пароль:</label>
@@ -155,11 +158,13 @@
                     <div id="adminMessage"></div>
                     
                     <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #8B0000;">
-                        <h4 style="color: #FF0000; margin-bottom: 0.5rem;">🔗 Готовая ссылка для NFC:</h4>
-                        <div id="shareUrl" style="word-break: break-all; background: #111; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 0.5rem;">
-                            https://your-site.com?img=https://d.uguu.se/GsoqmUfm.jpg&snd=https://d.uguu.se/cjxewZVk.mp3
-                        </div>
-                        <button id="copyUrl" style="background: #006600;">СКОПИРОВАТЬ ССЫЛКУ</button>
+                        <h4 style="color: #FF0000; margin-bottom: 0.5rem;">📋 Инструкция по загрузке файлов:</h4>
+                        <ol style="text-align: left; color: #ccc; font-size: 12px; padding-left: 1.2rem;">
+                            <li>Создайте папку <strong>files</strong> в репозитории</li>
+                            <li>Загрузите GIF файл как <strong>prank.gif</strong></li>
+                            <li>Загрузите звук как <strong>sound.mp3</strong></li>
+                            <li>Сайт автоматически загрузит файлы</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -172,19 +177,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             const prankImage = document.getElementById('prankImage');
             const prankSound = document.getElementById('prankSound');
-            const imageUrl = document.getElementById('imageUrl');
-            const soundUrl = document.getElementById('soundUrl');
+            const gifName = document.getElementById('gifName');
+            const soundName = document.getElementById('soundName');
             const saveBtn = document.getElementById('saveContent');
             const adminPass = document.getElementById('adminPassword');
             const message = document.getElementById('adminMessage');
-            const shareUrl = document.getElementById('shareUrl');
-            const copyUrlBtn = document.getElementById('copyUrl');
             const statusMessage = document.getElementById('statusMessage');
 
-            // Автоматически генерируем ссылку при загрузке
-            updateShareUrl();
+            // Автоматическая загрузка контента при старте
+            loadContent();
 
-            // Клик по картинке
+            // Клик по GIF
             prankImage.addEventListener('click', function() {
                 if (prankSound.src) {
                     prankSound.currentTime = 0;
@@ -194,7 +197,7 @@
                 }
             });
 
-            // Сохранение
+            // Сохранение настроек
             saveBtn.addEventListener('click', function() {
                 if (!adminPass.value) {
                     showMessage('Введите пароль', 'error');
@@ -206,53 +209,71 @@
                     return;
                 }
 
-                const imgUrl = imageUrl.value.trim();
-                const sndUrl = soundUrl.value.trim();
+                const gifFile = gifName.value.trim() || 'prank.gif';
+                const soundFile = soundName.value.trim() || 'sound.mp3';
 
-                if (!imgUrl && !sndUrl) {
-                    showMessage('Введите ссылки', 'error');
-                    return;
-                }
+                // Сохраняем настройки в localStorage
+                const settings = {
+                    gif: gifFile,
+                    sound: soundFile,
+                    timestamp: new Date().getTime()
+                };
+                localStorage.setItem('edemSid_settings', JSON.stringify(settings));
 
-                // Применение нового контента
-                if (imgUrl) prankImage.src = imgUrl;
-                if (sndUrl) prankSound.src = sndUrl;
-
-                // Обновление ссылки
-                updateShareUrl();
-
-                showMessage('Контент обновлен!', 'success');
+                // Обновляем контент
+                updateContent(gifFile, soundFile);
+                showMessage('Настройки сохранены!', 'success');
                 adminPass.value = '';
             });
 
-            // Копирование ссылки
-            copyUrlBtn.addEventListener('click', function() {
-                const textToCopy = shareUrl.textContent;
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    showMessage('Ссылка скопирована в буфер!', 'success');
-                }).catch(() => {
-                    // Fallback для старых браузеров
-                    const textArea = document.createElement('textarea');
-                    textArea.value = textToCopy;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showMessage('Ссылка скопирована!', 'success');
-                });
-            });
+            // Загрузка контента
+            function loadContent() {
+                // Пробуем загрузить из настроек
+                const savedSettings = JSON.parse(localStorage.getItem('edemSid_settings') || '{}');
+                const gifFile = savedSettings.gif || 'prank.gif';
+                const soundFile = savedSettings.sound || 'sound.mp3';
 
-            // Обновление ссылки для NFC
-            function updateShareUrl() {
-                const imgUrl = imageUrl.value.trim() || 'https://d.uguu.se/GsoqmUfm.jpg';
-                const sndUrl = soundUrl.value.trim() || 'https://d.uguu.se/cjxewZVk.mp3';
-                
-                const params = new URLSearchParams();
-                params.set('img', encodeURIComponent(imgUrl));
-                params.set('snd', encodeURIComponent(sndUrl));
-                
-                const generatedUrl = `${window.location.origin}${window.location.pathname}?${params}`;
-                shareUrl.textContent = generatedUrl;
+                // Обновляем поля ввода
+                gifName.value = gifFile;
+                soundName.value = soundFile;
+
+                // Загружаем контент
+                updateContent(gifFile, soundFile);
+            }
+
+            // Обновление контента
+            function updateContent(gifFile, soundFile) {
+                statusMessage.textContent = 'Загрузка контента...';
+                statusMessage.style.color = '#ffff00';
+
+                const gifPath = `./files/${gifFile}`;
+                const soundPath = `./files/${soundFile}`;
+
+                // Загружаем GIF
+                prankImage.onload = function() {
+                    statusMessage.textContent = '✅ GIF загружена!';
+                    statusMessage.style.color = '#0f0';
+                };
+
+                prankImage.onerror = function() {
+                    statusMessage.textContent = '❌ Ошибка загрузки GIF';
+                    statusMessage.style.color = '#f00';
+                };
+
+                // Загружаем звук
+                prankSound.oncanplaythrough = function() {
+                    statusMessage.textContent = '✅ GIF и звук загружены!';
+                    statusMessage.style.color = '#0f0';
+                };
+
+                prankSound.onerror = function() {
+                    statusMessage.textContent = '❌ Ошибка загрузки звука';
+                    statusMessage.style.color = '#f00';
+                };
+
+                // Устанавливаем новые источники
+                prankImage.src = gifPath + '?t=' + Date.now(); // Добавляем timestamp для избежания кэша
+                prankSound.src = soundPath + '?t=' + Date.now();
             }
 
             // Секретный вход в админку
@@ -281,21 +302,7 @@
                 }, 3000);
             }
 
-            // Проверка загрузки контента
-            prankImage.onload = function() {
-                statusMessage.textContent = '✅ Картинка и звук загружены! Сайт готов к работе.';
-            };
-
-            prankImage.onerror = function() {
-                statusMessage.textContent = '⚠️ Ошибка загрузки картинки';
-                statusMessage.style.color = '#ff4444';
-            };
-
-            prankSound.oncanplaythrough = function() {
-                statusMessage.textContent = '✅ Картинка и звук загружены! Сайт готов к работе.';
-            };
-
-            console.log('🎭 EDEM SID doxing mod запущен с Uguu.se контентом!');
+            console.log('🎭 EDEM SID doxing mod запущен с локальными файлами!');
         });
     </script>
 </body>
